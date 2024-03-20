@@ -55,6 +55,11 @@ public:
     {
         return accountNumber;
     }
+
+    double getBalance() const
+    {
+        return balance;
+    }
 };
 
 class Bank
@@ -109,6 +114,71 @@ public:
             cout << "Account not found." << endl;
         }
     }
+
+    void transferFunds()
+    {
+        string fromAccount, toAccount;
+        double amount;
+        cout << "Enter source account number: ";
+        cin >> fromAccount;
+        cout << "Enter destination account number: ";
+        cin >> toAccount;
+        cout << "Enter amount to transfer: ";
+        cin >> amount;
+
+        Account* sourceAcc = findAccount(fromAccount);
+        Account* destAcc = findAccount(toAccount);
+
+        if (sourceAcc != nullptr && destAcc != nullptr) {
+            if (sourceAcc->getBalance() >= amount) 
+			{
+                sourceAcc->withdraw(amount);
+                destAcc->deposit(amount);
+                cout << "Transfer successful." << endl;
+            }
+            else 
+			{
+                cout << "Insufficient funds in the source account." << endl;
+            }
+        }
+        else 
+		{
+            cout << "One or both accounts not found." << endl;
+        }
+    }
+
+    void closeAccount()
+    {
+        string accNum;
+        cout << "Enter account number to close: ";
+        cin >> accNum;
+
+        for (auto it = accounts.begin(); it != accounts.end(); ++it) 
+		{
+            if (it->getAccountNumber() == accNum) {
+                accounts.erase(it);
+                cout << "Account closed successfully." << endl;
+                return;
+            }
+        }
+        cout << "Account not found." << endl;
+    }
+
+    void displayAccountInformation()
+    {
+        string accNum;
+        cout << "Enter account number: ";
+        cin >> accNum;
+
+        Account* acc = findAccount(accNum);
+        if (acc != nullptr) {
+            acc->displayBalance();
+            cout << endl;
+        }
+        else {
+            cout << "Account not found." << endl;
+        }
+    }
 };
 
 int main()
@@ -123,8 +193,11 @@ int main()
         cout << "2. Deposit\n";
         cout << "3. Withdraw\n";
         cout << "4. Change Balance\n";
-        cout << "5. Display All Accounts\n";
-        cout << "6. Exit\n";
+        cout << "5. Transfer Funds\n";
+        cout << "6. Close Account\n";
+        cout << "7. Account Information\n";
+        cout << "8. Display All Accounts\n";
+        cout << "9. Exit\n";
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -149,6 +222,11 @@ int main()
             cin >> accNum;
             cout << "Enter deposit amount: ";
             cin >> amount;
+            Account* acc = bank.findAccount(accNum);
+            if (acc != nullptr)
+                acc->deposit(amount);
+            else
+                cout << "Account not found." << endl;
             break;
         }
         case 3:
@@ -159,21 +237,35 @@ int main()
             cin >> accNum;
             cout << "Enter withdrawal amount: ";
             cin >> amount;
+            Account* acc = bank.findAccount(accNum);
+            if (acc != nullptr)
+                acc->withdraw(amount);
+            else
+                cout << "Account not found." << endl;
             break;
         }
         case 4:
             bank.changeAccountBalance();
             break;
         case 5:
-            bank.displayAllAccounts();
+            bank.transferFunds();
             break;
         case 6:
+            bank.closeAccount();
+            break;
+        case 7:
+            bank.displayAccountInformation();
+            break;
+        case 8:
+            bank.displayAllAccounts();
+            break;
+        case 9:
             cout << "Exiting program." << endl;
             break;
         default:
             cout << "Invalid choice. Please try again." << endl;
         }
-    } while (choice != 6);
+    } while (choice != 9);
 
     return 0;
 }
